@@ -4,6 +4,7 @@ import math
 
 
 class ScreenManager:
+    # Initializes the screen with specified width, height, title, and background color.
     def __init__(self, width, height, title, bgcolor):
         self.screen = turtle.Screen()
         self.screen.setup(width, height)
@@ -11,12 +12,15 @@ class ScreenManager:
         self.screen.bgcolor(bgcolor)
         self.screen.tracer(0)
 
+    # Updates the screen to reflect any changes.
     def update_screen(self):
         self.screen.update()
 
+    # Registers a new shape (image) that can be used in the turtle graphics.
     def register_shape(self, shape):
         self.screen.register_shape(shape)
 
+    # Sets key bindings for player movement.
     def set_key_bindings(self, player_movement_manager):
         self.screen.listen()
         self.screen.onkey(lambda: player_movement_manager.move_player("left"), "Left")
@@ -24,11 +28,13 @@ class ScreenManager:
         self.screen.onkey(lambda: player_movement_manager.move_player("up"), "Up")
         self.screen.onkey(lambda: player_movement_manager.move_player("down"), "Down")
 
+    # Closes the screen, effectively ending the game.
     def end_game(self):
         self.screen.bye()
 
 
 class Wall(turtle.Turtle):
+    # Initializes the wall with default properties.
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.shape("square")
@@ -37,9 +43,11 @@ class Wall(turtle.Turtle):
         self.penup()
         self.speed(0)
 
+    # Flashes the wall with a specified color, times, and duration.
     def flash(self, flash_color="yellow", times=3, duration=200):
         self._flash(flash_color, times, True, duration)
 
+    # Helper function for the flash method to handle the flashing logic.
     def _flash(self, flash_color, times, state, duration):
         if times > 0:
             if state:
@@ -50,13 +58,16 @@ class Wall(turtle.Turtle):
         else:
             self.restore_original_state()  # Call the method to restore the original state
 
+    # Changes the wall's color.
     def change_color(self, color):
         self.color(color)
 
+    # Checks if the wall is touching another object.
     def is_touching(self, other_obj):
         # Basic distance check to determine if touching another object
         return self.distance(other_obj) < 24  # Assuming a grid size of 24
 
+    # Restores the wall to its original state (color, size, visibility).
     def restore_original_state(self):
         self.color("gray")
         self.showturtle()
@@ -64,6 +75,7 @@ class Wall(turtle.Turtle):
 
 
 class Player(turtle.Turtle):
+    # Initializes the player with default attributes.
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.shape("jucator.gif")
@@ -133,6 +145,7 @@ class Player(turtle.Turtle):
         else:
             return False
 
+    # Updates the player's status (score and life).
     def update_status(self, score_increment=0, life_decrement=0):
         self.award += score_increment
         self.life -= life_decrement
@@ -140,6 +153,7 @@ class Player(turtle.Turtle):
 
 
 class Treasure(turtle.Turtle):
+    # Initializes the treasure at a given location.
     def __init__(self, x, y):
         turtle.Turtle.__init__(self)
         self.shape("comoara.gif")
@@ -148,20 +162,23 @@ class Treasure(turtle.Turtle):
         self.award = 1000
         self.goto(x, y)
 
-    # The function which remove the treasure from the screen
+    # Removes the treasure from the screen.
     def destroy(self):
         self.goto(2000, 2000)
         self.hideturtle()
 
+    # Temporarily hides the treasure.
     def hide_temporarily(self):
         self.hideturtle()
         turtle.ontimer(self.show, 7000)  # Schedule the show method to be called after 10 seconds
 
+    # Shows the treasure (used in conjunction with hide_temporarily).
     def show(self):
         self.showturtle()
 
 
 class Key(turtle.Turtle):
+    # Initializes the key at a given location.
     def __init__(self, x, y):
         turtle.Turtle.__init__(self)
         self.shape("cheie.gif")
@@ -170,19 +187,23 @@ class Key(turtle.Turtle):
         self.goto(x, y)
         self.door_bound_to = None  # Initially, the key is not bound to any door
 
+    # Removes the key from the screen.
     def destroy(self):
         self.goto(2000, 2000)
         self.hideturtle()
 
+    # Checks if the key has been picked up by the player.
     def is_picked_up(self, player_instance):
         return self.distance(player_instance) < 20
 
+    # Displays a message when the key is picked up.
     @staticmethod
     def display_pickup_message():
         print("You have picked up a key!")
 
 
 class Door(turtle.Turtle):
+    # Initializes the door at a given location.
     def __init__(self, x, y):
         turtle.Turtle.__init__(self)
         self.shape("usa.gif")
@@ -190,19 +211,22 @@ class Door(turtle.Turtle):
         self.speed(0)
         self.goto(x, y)
 
-    # The function which remove the door from the screen
+    # Removes the door from the screen.
     def destroy(self):
         self.goto(2000, 2000)
         self.hideturtle()
 
+    # Returns the x-coordinate of the door.
     def x(self):
         return self.xcor()
 
+    # Returns the y-coordinate of the door.
     def y(self):
         return self.ycor()
 
 
 class Enemy(turtle.Turtle):
+    # Initializes the enemy at a given location.
     def __init__(self, x, y):
         turtle.Turtle.__init__(self)
         self.shape("monstru.gif")
@@ -212,6 +236,7 @@ class Enemy(turtle.Turtle):
         self.goto(x, y)
         self.direction = random.choice(["up", "down", "left", "right"])  # The enemy is moving randomly
 
+    # Moves the enemy in a specified direction.
     def move(self):
         if self.direction == "up":
             dx = 0
@@ -250,6 +275,7 @@ class Enemy(turtle.Turtle):
 
 
 class Exit(turtle.Turtle):
+    # Initializes the exit at a given location.
     def __init__(self, x, y):
         turtle.Turtle.__init__(self)
         self.shape("square")
@@ -258,18 +284,20 @@ class Exit(turtle.Turtle):
         self.speed(0)
         self.goto(x, y)
 
-    # The function which remove the exit from the screen
+    # Removes the exit from the screen.
     def destroy(self):
         self.goto(2000, 2000)
         self.hideturtle()
 
 
 class PlayerMovementManager:
+    # Initializes the manager with the player and references to walls and doors.
     def __init__(self, player_instance, walls_instance, doors_instance):
         self.player = player_instance
         self.walls = walls_instance
         self.doors = doors_instance
 
+    # Moves the player in a specified direction.
     def move_player(self, direction):
         move_functions = {
             'up': self._move_up,
@@ -281,6 +309,7 @@ class PlayerMovementManager:
         if move_func:
             move_func()
 
+    # Helper methods for moving the player in each direction.
     def _move_up(self):
         self._move(0, 24)
 
@@ -301,23 +330,28 @@ class PlayerMovementManager:
 
 
 class CollisionManager:
+    # Initializes the collision manager.
     def __init__(self):
         self.collision_logging_enabled = False
 
+    # Checks if there is a collision between two objects.
     def is_collision(self, obj1, obj2):
         distance = self._calculate_distance(obj1, obj2)
         return distance < 5
 
+    # Checks if one object is next to another object.
     def is_next_to(self, obj1, obj2):
         distance = self._calculate_distance(obj1, obj2)
         return distance < 27
 
+    # Calculates the distance between two objects.
     @staticmethod
     def _calculate_distance(obj1, obj2):
         a = obj1.xcor() - obj2.xcor()
         b = obj1.ycor() - obj2.ycor()
         return math.sqrt((a ** 2) + (b ** 2))
 
+    # Detects collision between the player and enemies.
     def detect_enemy_collision(self, player_instance, enemies_instance):
         for enemy_instance in enemies_instance:
             if self.is_collision(player_instance, enemy_instance):
@@ -325,6 +359,7 @@ class CollisionManager:
                 return True
         return False
 
+    # Detects collision between the player and treasures.
     def detect_treasure_collision(self, player_instance, treasures_instance):
         for treasure_instance in treasures_instance:
             if self.is_collision(player_instance, treasure_instance):
@@ -332,6 +367,7 @@ class CollisionManager:
                 return True
         return False
 
+    # Detects collision between the player and keys.
     def detect_key_collision(self, player_instance, keys_instance):
         for key_instance in keys_instance:
             if self.is_collision(player_instance, key_instance):
@@ -341,6 +377,7 @@ class CollisionManager:
 
 
 class MazeBuilder:
+    # Initializes the MazeBuilder with a given maze layout.
     def __init__(self, maze_layout):
         self.maze_layout = maze_layout
         self.walls = []
@@ -351,6 +388,7 @@ class MazeBuilder:
         self.closed_doors = []
         self.exits = []
 
+    # Builds the maze based on the layout.
     def build_maze(self):
         for y, row in enumerate(self.maze_layout):
             for x, char in enumerate(row):
@@ -360,6 +398,7 @@ class MazeBuilder:
 
         return self.walls, self.doors
 
+    # Processes each element in the maze layout and creates the appropriate object.
     def process_maze_element(self, char, x, y):
         if char == "X":
             self.create_wall(x, y)
@@ -376,28 +415,34 @@ class MazeBuilder:
         elif char == "O":
             self.create_exit(x, y)
 
+    # Creates a wall at a specific location.
     def create_wall(self, x, y):
         wall.goto(x, y)
         wall.stamp()
         self.walls.append((x, y))
 
+    # Creates a door at a specific location.
     def create_door(self, x, y):
         door_instance = Door(x, y)
         self.closed_doors.append(door_instance)
         self.doors.append((x, y))
 
+    # Creates a treasure at a specific location.
     def create_treasure(self, x, y):
         treasure_instance = Treasure(x, y)
         self.treasures.append(treasure_instance)
 
+    # Creates an enemy at a specific location.
     def create_enemy(self, x, y):
         enemy_instance = Enemy(x, y)
         self.enemies.append(enemy_instance)
 
+    # Creates a key at a specific location.
     def create_key(self, x, y):
         key_instance = Key(x, y)
         self.keys.append(key_instance)
 
+    # Creates an exit at a specific location.
     def create_exit(self, x, y):
         exit_instance = Exit(x, y)
         self.exits.append(exit_instance)
